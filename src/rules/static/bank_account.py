@@ -1,9 +1,8 @@
 import random
 from typing import Tuple
-from rules import token
-import re
-
-IBAN_REGEX = r'([a-zA-Z]{2})\d{26}'
+import schwifty
+from schwifty import exceptions
+from src.rules import token
 
 
 class BankAccount:
@@ -12,9 +11,16 @@ class BankAccount:
 
     @staticmethod
     def anonymize(word: str) -> Tuple[token.Token, bool]:
-        match = re.search(IBAN_REGEX, word)
-        if match:
-            return BankToken(match.group(1)), True
+        try:
+            iban = schwifty.IBAN(word)
+            if iban.validate():
+                return BankToken(iban.country_code), True
+        except (exceptions.InvalidLength, exceptions.InvalidCountryCode, exceptions.InvalidBankCode,
+                exceptions.InvalidChecksumDigits):
+            # Treat slightly invalid IBANs as sensitive information
+            return BankToken("PL"), True
+        except exceptions.SchwiftyException as X:
+            return BankToken(""), False
 
         return BankToken(""), False
 

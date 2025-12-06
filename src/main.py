@@ -1,7 +1,4 @@
 from rules.static import bank_account
-from rules import static
-from typing import List
-
 
 input = "This is my bank account: PL12345678901234567890123456"
 

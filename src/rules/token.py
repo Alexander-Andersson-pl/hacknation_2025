@@ -6,6 +6,7 @@ class TokenType(Enum):
     Unmatched = 0
     Email = 1
     BankAccount = 2
+    CreditCard = 3
 
 class Token(ABC):
     def __init__(self, type: TokenType):
