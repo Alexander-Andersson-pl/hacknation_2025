@@ -21,15 +21,15 @@ class TestName(unittest.TestCase):
         cases: List[TestCase] = [
             TestCase(
                 "Karol",
-                [name.NameToken(name.NameType.Personal)],
+                [name.NameToken(name.NameType.FirstName)],
             ),
             TestCase(
                 "Janem",
-                [name.NameToken(name.NameType.Personal)]
+                [name.NameToken(name.NameType.FirstName)]
             ),
             TestCase(
                 "Janem Karolem",
-                [name.NameToken(name.NameType.Personal)],
+                [name.NameToken(name.NameType.FirstName), name.NameToken(name.NameType.LastName)],
             ),
         ]
 

@@ -8,8 +8,11 @@ input = u"Rozmawiałem na giełdzie."
 
 
 class NameType(Enum):
-    Personal = 1
-    Location = 3
+    Unknown = 0
+    FirstName = 1
+    LastName = 2
+    BothNames = 3
+    Location = 4
 
 
 class Name:
@@ -28,21 +31,33 @@ class Name:
                 continue
 
             analyzed = morf.analyse(word)
-            handled = False
+            result = NameType.Unknown
             for a in analyzed:
                 if not a[2][2].startswith('subst'):
                     continue
 
-                if 'imie' in a[2][3] or 'nazwisko' in a[2][3]:
-                    handled = True
-                    out.append(NameToken(NameType.Personal))
+                if 'imię' in a[2][3]:
+                    if result == NameType.LastName or result == NameType.BothNames :
+                        result = NameType.BothNames
+                        continue
+                    result = NameType.FirstName
+                    continue
+
+                if 'nazwisko' in a[2][3]:
+                    if result == NameType.FirstName or result == NameType.BothNames :
+                        result = NameType.BothNames
+                        continue
+                    result = NameType.LastName
+                    continue
 
                 if 'nazwa_geograficzna' in a[2][3]:
-                    handled = True
-                    out.append(NameToken(NameType.Location))
+                    result = NameType.Location
 
-            if not handled:
+            if result == NameType.Unknown:
                 out.append(word)
+                continue
+
+            out.append(NameToken(result))
 
         # Unify 2 neighbouring tokens
         filtered = []
@@ -51,12 +66,36 @@ class Name:
                 filtered.append(o)
                 continue
 
-            if o == filtered[-1]:
-                continue
+            if isinstance(o, NameToken) and isinstance(filtered[-1], NameToken):
+                if o.nameType == NameType.Location or filtered[-1].nameType == NameType.Location:
+                    filtered.append(o)
+                    continue
+
+                if filtered[-1].nameType == NameType.BothNames:
+                    filtered[-1].nameType = NameType.FirstName
+                    continue
 
             filtered.append(o)
 
+        # Check last element
+        if len(filtered) == 0:
+            return []
+
+        if len(filtered) == 1 and isinstance(filtered[-1], NameToken):
+            if filtered[-1].nameType == NameType.BothNames:
+                filtered[-1].nameType = NameType.FirstName
+            return filtered
+
+        if isinstance(filtered[-1], NameToken) and isinstance(filtered[-2], NameToken) and filtered[-1].nameType == NameType.BothNames:
+            if filtered[-2].nameType == NameType.FirstName:
+                filtered[-1].nameType = NameType.LastName
+            else:
+                filtered[-1].nameType = NameType.FirstName
+
         return filtered
+
+
+
 
 class NameToken(token.Token):
     def __init__(self, nameType: NameType):
@@ -69,7 +108,6 @@ class NameToken(token.Token):
                 return "[personal_name]"
             case NameType.Location:
                 return "[location_name]"
-
 
     def generate(self) -> str:
         pass
