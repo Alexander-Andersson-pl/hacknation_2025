@@ -7,6 +7,8 @@ class TokenType(Enum):
     Email = 1
     BankAccount = 2
     CreditCard = 3
+    Pesel = 4
+
 
 class Token(ABC):
     def __init__(self, type: TokenType):
@@ -20,6 +22,3 @@ class Token(ABC):
     @abstractmethod
     def generate(self) -> str:
         pass
-
-
-
