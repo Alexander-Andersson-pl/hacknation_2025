@@ -31,3 +31,7 @@ go.work.sum
  .idea/
  .vscode/
 
+# python and venv
+venv/
+__pycache__/
+*.pyc
