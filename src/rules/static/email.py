@@ -1,27 +1,31 @@
 import re
-from typing import List, Tuple
+import random
+from typing import Tuple
+from rules import token
 
-# Matches common email formats; avoids matching trailing punctuation.
 EMAIL_REGEX = re.compile(
     r"(?P<email>[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})",
     flags=re.IGNORECASE,
 )
 
-TOKEN = "{email}"
+
+class Email:
+    @staticmethod
+    def anonymize(word: str) -> Tuple[token.Token, bool]:
+        match = re.search(EMAIL_REGEX, word)
+        if match:
+            return EmailToken(), True
+        return EmailToken(), False
 
 
-def anonymize(text: str) -> Tuple[str, List[str]]:
-    """
-    Replace email addresses with a placeholder token.
+class EmailToken(token.Token):
+    def __init__(self):
+        super().__init__(token.TokenType.Email)
 
-    Returns the anonymized text and a list of matched emails (for optional logging).
-    """
-    matches: List[str] = []
+    def label(self):
+        return "{email}"
 
-    def _sub(match: re.Match) -> str:
-        email = match.group("email")
-        matches.append(email)
-        return TOKEN
-
-    new_text = EMAIL_REGEX.sub(_sub, text)
-    return new_text, matches
+    def generate(self) -> str:
+        prefix = "user" + str(random.randint(1000, 9999))
+        domain = "example.com"
+        return f"{prefix}@{domain}"
