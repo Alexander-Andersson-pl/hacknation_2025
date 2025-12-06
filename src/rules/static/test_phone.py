@@ -1,17 +1,17 @@
 import unittest
 
 import sys
-from typing import List
+from typing import List, Any
 
 sys.path.append("src")
 
-from .phone import Phone
+from .phone import Phone, PhoneToken
 
 
 class TestCase:
-    def __init__(self, input: str, valid: bool) -> None:
+    def __init__(self, input: str, expected: List[Any]) -> None:
         self.input = input
-        self.valid = valid
+        self.expected = expected
 
 
 class TestPhone(unittest.TestCase):
@@ -19,14 +19,15 @@ class TestPhone(unittest.TestCase):
         phone_rule = Phone()
 
         cases: List[TestCase] = [
-            TestCase("48123123123", True),
-            TestCase("+375291231231", True),
-            TestCase("123123123", True),
+            TestCase("48123123123", [PhoneToken()]),
+            TestCase("+375291231231", [PhoneToken()]),
+            TestCase("123123123", [PhoneToken()]),
         ]
 
         for case in cases:
-            token, ok = phone_rule.anonymize(case.input)
-            self.assertEqual(ok, case.valid)
+            tokens = case.input.split()
+            got = phone_rule.anonymize(tokens)
+            self.assertEqual(got, case.expected)
 
 
 if __name__ == "__main__":

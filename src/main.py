@@ -1,22 +1,11 @@
-from rules.static import bank_account
+from rules.static import bank_account, name, credit_card, email, pesel_rule
 
-input = "This is my bank account: PL12345678901234567890123456"
+input = "Hi, My name is Jan Kowalski. My phone number is +48123123123 and my bank account is PL12345678901234567890123456"
 
-static_rules = [bank_account.BankAccount]
+static_rules = [bank_account.BankAccount, name.Name, credit_card.CreditCard, email.Email, pesel_rule.PeselRule]
 
 str = ""
-for word in input.split():
-    anonymized = False
+for rule in static_rules:
+    input = rule.anonymize(input)
 
-    for rule in static_rules:
-        token, ok = rule.anonymize(word)
-        if ok:
-            str += token.label()
-            anonymized = True
-            break
-
-    if not anonymized:
-        str += word
-    str += " "
-
-print(str)
+print(input)

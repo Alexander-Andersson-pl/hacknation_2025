@@ -1,5 +1,5 @@
 import random
-from typing import Tuple
+from typing import List, Any
 import schwifty
 from schwifty import exceptions
 from src.rules import token
@@ -10,23 +10,29 @@ class BankAccount:
         pass
 
     @staticmethod
-    def anonymize(word: str) -> Tuple[token.Token, bool]:
-        try:
-            iban = schwifty.IBAN(word)
-            if iban.validate():
-                return BankToken(iban.country_code), True
-        except (exceptions.InvalidLength, exceptions.InvalidCountryCode, exceptions.InvalidBankCode,
-                exceptions.InvalidChecksumDigits):
-            # Treat slightly invalid IBANs as sensitive information
-            country_code = "PL"
-            if len(word) > 2:
-                country_code = word[:2]
-            return BankToken(country_code), True
-        except exceptions.SchwiftyException as X:
-            return BankToken(""), False
+    def anonymize(tokens: List[Any]) -> List[Any]:
+        out = []
+        for idx in range(len(tokens)):
+            word = tokens[idx]
 
-        return BankToken(""), False
+            if not isinstance(word, str):
+                out.append(word)
+                continue
 
+            try:
+                iban = schwifty.IBAN(tokens[idx])
+                if iban.validate():
+                    out.append(BankToken(iban.country_code))
+            except (exceptions.InvalidLength, exceptions.InvalidCountryCode, exceptions.InvalidBankCode,
+                    exceptions.InvalidChecksumDigits):
+                # Treat slightly invalid IBANs as sensitive information
+                country_code = "PL"
+                if len(word) > 2:
+                    country_code = word[:2]
+                out.append(BankToken(country_code))
+            except exceptions.SchwiftyException as X:
+                out.append(word)
+        return out
 
 class BankToken(token.Token):
     def __init__(self, country_code: str):
@@ -34,14 +40,18 @@ class BankToken(token.Token):
         self.countryCode = country_code
 
     def label(self):
-        return "{bank_account}"
+        return "[bank_account]"
 
     def generate(self) -> str:
         randInt = random.randint(0, int(1e26))
         return self.countryCode + "{:026d}".format(randInt)
 
     def __eq__(self, other):
-        return self.countryCode == other.countryCode
+        if isinstance(other, BankToken):
+            return self.countryCode == other.countryCode
+
+        return False
+
 
     def __str__(self):
         return f"BankAccount({self.countryCode})"

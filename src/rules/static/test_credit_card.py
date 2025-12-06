@@ -1,15 +1,15 @@
 from .credit_card import CreditCard, CreditCardToken
-from typing import List
+from typing import List, Any
 import unittest
 
 
 class TestCase:
     input: str
-    expected_ok: bool
+    expected: List[Any]
 
-    def __init__(self, input: str, expected_ok: bool) -> None:
+    def __init__(self, input: str, expected: List[Any]) -> None:
         self.input = input
-        self.expected_ok = expected_ok
+        self.expected = expected
 
 class BankAccountTest(unittest.TestCase):
     def test_anonymize(self):
@@ -18,13 +18,14 @@ class BankAccountTest(unittest.TestCase):
         cases: List[TestCase] = [
             TestCase(
                 "1231231231231",
-                True,
+                [CreditCardToken()],
             ),
         ]
 
         for case in cases:
-            _, ok = ba.anonymize(case.input)
-            self.assertEqual(ok, case.expected_ok)
+            tokens = case.input.split()
+            got = ba.anonymize(tokens)
+            self.assertEqual(got, case.expected)
 
 
 if __name__ == '__main__':

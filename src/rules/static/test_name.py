@@ -1,17 +1,17 @@
 import unittest
-
 from src.rules.static import name
-# from .name import Name, NameToken
-from typing import List
+from typing import List, Any
 import morfeusz2
+
 
 class TestCase:
     input: str
-    expected: name.NameToken
+    expected: List[Any]
 
-    def __init__(self, input: str, expected: name.NameToken) -> None:
+    def __init__(self, input: str, expected: List[Any]) -> None:
         self.input = input
         self.expected = expected
+
 
 class TestName(unittest.TestCase):
     def test_name_anonymize(self):
@@ -21,18 +21,23 @@ class TestName(unittest.TestCase):
         cases: List[TestCase] = [
             TestCase(
                 "Karol",
-                name.NameToken(name.NameType.Personal),
+                [name.NameToken(name.NameType.Personal)],
             ),
             TestCase(
                 "Janem",
-                name.NameToken(name.NameType.Personal)
+                [name.NameToken(name.NameType.Personal)]
+            ),
+            TestCase(
+                "Janem Karolem",
+                [name.NameToken(name.NameType.Personal)],
             ),
         ]
 
         for case in cases:
-            got, ok = ba.anonymize(case.input)
-            self.assertTrue(ok)
+            tokens = case.input.split()
+            got = ba.anonymize(tokens)
             self.assertEqual(got, case.expected)
+
 
 if __name__ == '__main__':
     unittest.main()
