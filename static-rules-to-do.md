@@ -1,10 +1,8 @@
 Static Rules to do:
 
-- [ ] {email}
+- [x] {email}
 - [ ] {phone}
 - [ ] {pesel}
 - [ ] {document-number}
 - [X] {bank-account}
-- [ ] {credit-card-number}
-- [ ] {username}
-- [ ] {secret}
+- [x] {credit-card-number}

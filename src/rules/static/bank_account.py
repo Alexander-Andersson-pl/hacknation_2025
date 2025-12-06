@@ -18,7 +18,10 @@ class BankAccount:
         except (exceptions.InvalidLength, exceptions.InvalidCountryCode, exceptions.InvalidBankCode,
                 exceptions.InvalidChecksumDigits):
             # Treat slightly invalid IBANs as sensitive information
-            return BankToken("PL"), True
+            country_code = "PL"
+            if len(word) > 2:
+                country_code = word[:2]
+            return BankToken(country_code), True
         except exceptions.SchwiftyException as X:
             return BankToken(""), False
 
@@ -36,3 +39,9 @@ class BankToken(token.Token):
     def generate(self) -> str:
         randInt = random.randint(0, int(1e26))
         return self.countryCode + "{:026d}".format(randInt)
+
+    def __eq__(self, other):
+        return self.countryCode == other.countryCode
+
+    def __str__(self):
+        return f"BankAccount({self.countryCode})"

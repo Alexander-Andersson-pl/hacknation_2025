@@ -1,32 +1,39 @@
-from bank_account import BankAccount
+from .bank_account import BankAccount, BankToken
 from typing import List
+import unittest
 
 class TestCase:
     input: str
-    expected: str
+    expected: BankToken
 
-    def __init__(self, input: str, expected: str) -> None:
+    def __init__(self, input: str, expected: BankToken) -> None:
         self.input = input
         self.expected = expected
 
-def test_bank_account_anonymize():
-    ba = BankAccount()
+class BankAccountTest(unittest.TestCase):
+    def test_anonymize(self):
+        ba = BankAccount()
 
-    cases: List[TestCase] = [
-        TestCase(
-            "This is my bank account: PL12345678901234567890123456",
-            "This is my bank account: {bank_account}"
-        ),
-        TestCase(
-            "PL12345678901234567890123456",
-            "{bank_account}"
-        ),
-        TestCase(
-        "DE12345678901234566",
-            "{bank_account}"
-        )
-    ]
+        cases: List[TestCase] = [
+            TestCase("PL", BankToken("")),
+            TestCase("123123123", BankToken("")),
+            TestCase(
+                "PL12345678901234567890123456",
+                BankToken("PL"),
+            ),
+            TestCase(
+                "PL12345678901234567890123456",
+                BankToken("PL"),
+            ),
+            TestCase(
+            "DE1234567890123456612322",
+                BankToken("DE"),
+            )
+        ]
 
-    for case in cases:
-        got = ba.anonymize(case.input)
-        assert got == case.expected
+        for case in cases:
+            got, ok = ba.anonymize(case.input)
+            self.assertEqual(got, case.expected)
+
+if __name__ == '__main__':
+    unittest.main()

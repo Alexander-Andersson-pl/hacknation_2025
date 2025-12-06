@@ -1,24 +1,31 @@
-from bank_account import BankAccount
+from .credit_card import CreditCard, CreditCardToken
 from typing import List
+import unittest
+
 
 class TestCase:
     input: str
-    expected: str
+    expected_ok: bool
 
-    def __init__(self, input: str, expected: str) -> None:
+    def __init__(self, input: str, expected_ok: bool) -> None:
         self.input = input
-        self.expected = expected
+        self.expected_ok = expected_ok
 
-def test_bank_account_anonymize():
-    ba = BankAccount()
+class BankAccountTest(unittest.TestCase):
+    def test_anonymize(self):
+        ba = CreditCard()
 
-    cases: List[TestCase] = [
-        TestCase(
-            "This is my cc: 123123123123",
-            "This is my cc: {cc_number}"
-        ),
-    ]
+        cases: List[TestCase] = [
+            TestCase(
+                "1231231231231",
+                True,
+            ),
+        ]
 
-    for case in cases:
-        got = ba.anonymize(case.input)
-        assert got == case.expected
+        for case in cases:
+            _, ok = ba.anonymize(case.input)
+            self.assertEqual(ok, case.expected_ok)
+
+
+if __name__ == '__main__':
+    unittest.main()

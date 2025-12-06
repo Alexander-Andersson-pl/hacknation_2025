@@ -1,3 +1,5 @@
 transformers
 schwifty
 pesel
+spacy
+morfeusz2

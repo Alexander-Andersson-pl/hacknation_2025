@@ -15,7 +15,7 @@ install:
     {{pip}} install --upgrade pip
     {{pip}} install -r requirements.txt
     @echo "📦 Installing spaCy Polish model..."
-    {{python}} -m spacy download pl_core_news_lg || true
+#    {{python}} -m spacy download pl_core_news_lg || true
 
 main:
     {{python}} src/main.py

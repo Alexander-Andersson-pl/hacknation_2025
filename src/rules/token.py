@@ -8,6 +8,7 @@ class TokenType(Enum):
     BankAccount = 2
     CreditCard = 3
     Pesel = 4
+    Name = 5
 
 
 class Token(ABC):
