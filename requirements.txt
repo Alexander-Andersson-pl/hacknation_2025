@@ -3,3 +3,4 @@ schwifty
 pesel
 spacy
 morfeusz2
+phonenumbers
