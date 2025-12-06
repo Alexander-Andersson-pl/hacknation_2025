@@ -23,6 +23,7 @@ class Email:
             match = re.search(EMAIL_REGEX, word)
             if not match:
                 out.append(word)
+                continue
 
             out.append(EmailToken())
 

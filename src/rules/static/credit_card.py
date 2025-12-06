@@ -24,6 +24,8 @@ class CreditCard:
             match = re.search(CCNUMBER_REGEX, word)
             if match:
                 out.append(CreditCardToken())
+            else:
+                out.append(word)
 
         return out
 

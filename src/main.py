@@ -1,6 +1,6 @@
 from rules.static import bank_account, name, credit_card, email, pesel_rule
 
-input = "Hi, My name is Jan Kowalski. My phone number is +48123123123 and my bank account is PL12345678901234567890123456"
+input = "Nazywam się Jan Kowalski, mój PESEL to 90010112345. Mieszkam w Warszawie przy ulicy Długiej 5."
 
 static_rules = [
     bank_account.BankAccount,
@@ -10,8 +10,15 @@ static_rules = [
     pesel_rule.PeselRule,
 ]
 
-str = ""
+tokens = input.split()
 for rule in static_rules:
-    input = rule.anonymize(input)
+    tokens = rule.anonymize(tokens)
 
-print(input)
+
+def mapToString(x) -> str:
+    if isinstance(x, str):
+        return x
+    else:
+        return x.label()
+
+print(" ".join(map(mapToString, tokens)))

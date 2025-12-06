@@ -104,8 +104,12 @@ class NameToken(token.Token):
 
     def label(self):
         match self.nameType:
-            case NameType.Personal:
-                return "[personal_name]"
+            case NameType.FirstName:
+                return "[first_name]"
+            case NameType.LastName:
+                return "[last_name]"
+            case NameType.BothNames:
+                return "[name]"
             case NameType.Location:
                 return "[location_name]"
 
