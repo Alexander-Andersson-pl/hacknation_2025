@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 from typing import Tuple
-
 from src.rules.token import Token
 
 

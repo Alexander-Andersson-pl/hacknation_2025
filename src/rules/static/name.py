@@ -3,16 +3,22 @@ from src.rules import token
 from enum import Enum
 import morfeusz2
 
-morf = morfeusz2.Morfeusz()
-input = u"Rozmawiałem na giełdzie."
-
-
 class NameType(Enum):
     Unknown = 0
     FirstName = 1
     LastName = 2
-    BothNames = 3
     Location = 4
+
+    def __str__(self):
+        match self:
+            case NameType.Unknown:
+                return "unknown"
+            case NameType.FirstName:
+                return "first_name"
+            case NameType.LastName:
+                return "last_name"
+            case NameType.Location:
+                return "location"
 
 
 class Name:
@@ -20,8 +26,7 @@ class Name:
         self.morfeusz = morfeusz
         pass
 
-    @staticmethod
-    def anonymize(tokens: List[Any]) -> List[Any]:
+    def anonymize(self, tokens: List[Any]) -> List[Any]:
         out = []
         for idx in range(len(tokens)):
             word = tokens[idx]
@@ -30,88 +35,136 @@ class Name:
                 out.append(word)
                 continue
 
-            analyzed = morf.analyse(word)
-            result = NameType.Unknown
+            analyzed = self.morfeusz.analyse(word)
+            results = []
             for a in analyzed:
                 if not a[2][2].startswith('subst'):
                     continue
 
-                if 'imię' in a[2][3]:
-                    if result == NameType.LastName or result == NameType.BothNames :
-                        result = NameType.BothNames
-                        continue
-                    result = NameType.FirstName
-                    continue
+                if 'imię' in a[2][3] and NameType.FirstName not in results:
+                    results.append(NameType.FirstName)
 
-                if 'nazwisko' in a[2][3]:
-                    if result == NameType.FirstName or result == NameType.BothNames :
-                        result = NameType.BothNames
-                        continue
-                    result = NameType.LastName
-                    continue
+                if 'nazwisko' in a[2][3] and NameType.LastName not in results:
+                    results.append(NameType.LastName)
 
-                if 'nazwa_geograficzna' in a[2][3]:
-                    result = NameType.Location
+                if 'nazwa_geograficzna' in a[2][3] and NameType.Location not in results:
+                    results.append(NameType.Location)
 
-            if result == NameType.Unknown:
+            if len(results) == 0:
                 out.append(word)
                 continue
 
-            out.append(NameToken(result))
+            out.append(NameToken(results))
 
-        # Unify 2 neighbouring tokens
-        filtered = []
-        for o in out:
-            if len(filtered) == 0:
-                filtered.append(o)
+        self.normalize_names(out)
+        out = self.normalize_street(out)
+        out = self.normalize_address(out)
+
+        return out
+
+    def normalize_names(self, tokens):
+        for i in range(0, len(tokens) - 1):
+            current = tokens[i]
+            next = tokens[i + 1]
+
+            if not isinstance(current, NameToken) or not isinstance(next, NameToken):
                 continue
 
-            if isinstance(o, NameToken) and isinstance(filtered[-1], NameToken):
-                if o.nameType == NameType.Location or filtered[-1].nameType == NameType.Location:
-                    filtered.append(o)
-                    continue
+            if NameType.FirstName in current.nameTypes and NameType.LastName in next.nameTypes:
+                current.nameTypes = [NameType.FirstName]
+                next.nameTypes = [NameType.LastName]
 
-                if filtered[-1].nameType == NameType.BothNames:
-                    filtered[-1].nameType = NameType.FirstName
-                    continue
+    def normalize_street(self, tokens: List[Any]) -> List[Any]:
+        normalized = []
+        i = -1
+        while i < len(tokens) - 1:
+            i += 1
+            current = tokens[i]
+            if not isinstance(current, str):
+                normalized.append(current)
+                continue
 
-            filtered.append(o)
+            isStreet = False
+            for a in self.morfeusz.analyse(current):
+                if a[2][1] == 'ulica' or a[2][1] == 'aleja':
+                    isStreet = True
+                    break
 
-        # Check last element
-        if len(filtered) == 0:
-            return []
+            if not isStreet:
+                normalized.append(current)
+                continue
 
-        if len(filtered) == 1 and isinstance(filtered[-1], NameToken):
-            if filtered[-1].nameType == NameType.BothNames:
-                filtered[-1].nameType = NameType.FirstName
-            return filtered
+            # check next
+            if i >= len(tokens) - 2:
+                continue
 
-        if isinstance(filtered[-1], NameToken) and isinstance(filtered[-2], NameToken) and filtered[-1].nameType == NameType.BothNames:
-            if filtered[-2].nameType == NameType.FirstName:
-                filtered[-1].nameType = NameType.LastName
-            else:
-                filtered[-1].nameType = NameType.FirstName
+            next = tokens[i + 1]
+            if not isinstance(next, NameToken):
+                normalized.append(next)
+                continue
 
-        return filtered
+            normalized.append(AddressToken())
+            i += 1  # Skip next element
 
+            # Check for number after street
+            if i >= len(tokens) - 1:
+                continue
 
+            next = tokens[i + 1]
+            if not isInteger(next):
+                continue
+
+            i+=1
+
+        return normalized
+
+    def normalize_address(self, tokens: List[Any]) -> List[Any]:
+        normalized = []
+        i = -1
+        while i < len(tokens) - 1:
+            i += 1
+            current = tokens[i]
+            if not isinstance(current, NameToken) or NameType.Location not in current.nameTypes:
+                normalized.append(current)
+                continue
+
+            # check next
+            if i >= len(tokens) - 2:
+                normalized.append(current)
+                continue
+
+            next = tokens[i + 1]
+            nexter = tokens[i+2] # :)
+            if next in ["przy", "na", "niedaleko"] and isinstance(nexter, AddressToken):
+                normalized.append(AddressToken())
+                i+=2
+                continue
+
+            normalized.append(current)
+
+        return normalized
+
+class AddressToken(token.Token):
+    def __init__(self):
+        super().__init__(token.TokenType.Address)
+
+    def __eq__(self, other):
+        return isinstance(other, AddressToken)
+
+    def label(self):
+        return "[address]"
+
+    def generate(self) -> str:
+        pass
 
 
 class NameToken(token.Token):
-    def __init__(self, nameType: NameType):
+    def __init__(self, nameTypes: List[NameType]):
         super().__init__(token.TokenType.Name)
-        self.nameType = nameType
+        self.nameTypes = nameTypes
 
     def label(self):
-        match self.nameType:
-            case NameType.FirstName:
-                return "[first_name]"
-            case NameType.LastName:
-                return "[last_name]"
-            case NameType.BothNames:
-                return "[name]"
-            case NameType.Location:
-                return "[location_name]"
+        return "[" + "|".join(map(str, self.nameTypes)) + "]"
 
     def generate(self) -> str:
         pass
@@ -120,4 +173,12 @@ class NameToken(token.Token):
         if isinstance(other, NameToken):
             return other.nameType == self.nameType
 
+        return False
+
+
+def isInteger(x):
+    try:
+        int(x)
+        return True
+    except ValueError:
         return False

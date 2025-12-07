@@ -1,7 +1,6 @@
 import random
 from typing import List, Any
-import schwifty
-from schwifty import exceptions
+from schwifty import exceptions, IBAN
 from src.rules import token
 
 
@@ -20,7 +19,7 @@ class BankAccount:
                 continue
 
             try:
-                iban = schwifty.IBAN(tokens[idx])
+                iban = IBAN(tokens[idx])
                 if iban.validate():
                     out.append(BankToken(iban.country_code))
             except (exceptions.InvalidLength, exceptions.InvalidCountryCode, exceptions.InvalidBankCode,
@@ -39,19 +38,18 @@ class BankToken(token.Token):
         super().__init__(token.TokenType.BankAccount)
         self.countryCode = country_code
 
-    def label(self):
-        return "[bank_account]"
-
-    def generate(self) -> str:
-        randInt = random.randint(0, int(1e26))
-        return self.countryCode + "{:026d}".format(randInt)
-
     def __eq__(self, other):
         if isinstance(other, BankToken):
             return self.countryCode == other.countryCode
 
         return False
 
-
     def __str__(self):
         return f"BankAccount({self.countryCode})"
+
+    def label(self):
+        return "[bank_account]"
+
+    def generate(self) -> str:
+        randInt = random.randint(0, int(1e26))
+        return self.countryCode + "{:026d}".format(randInt)

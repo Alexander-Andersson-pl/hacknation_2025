@@ -10,6 +10,8 @@ class TokenType(Enum):
     Pesel = 4
     Name = 5
     Phone = 6
+    Address = 7
+    Age = 8
 
 
 class Token(ABC):
@@ -23,4 +25,5 @@ class Token(ABC):
 
     @abstractmethod
     def generate(self) -> str:
+        # All tokens need to store morphological data based on morpheus analysis for proper generation
         pass

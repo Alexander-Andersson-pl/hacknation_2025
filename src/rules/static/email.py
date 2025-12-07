@@ -29,6 +29,7 @@ class Email:
 
         return out
 
+
 class EmailToken(token.Token):
     def __init__(self):
         super().__init__(token.TokenType.Email)

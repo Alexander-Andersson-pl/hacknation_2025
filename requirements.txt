@@ -4,3 +4,4 @@ pesel
 spacy
 morfeusz2
 phonenumbers
+flask
