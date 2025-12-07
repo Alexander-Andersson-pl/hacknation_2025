@@ -1,4 +1,4 @@
-time_seconds: 12.78
+time_seconds: 15.78
 pc_specs:
 	Laptop Samsung NP750QGK
 	CPU Intel Core7 150U @ 1.8GHZ

@@ -1,1 +1,2 @@
-Dane wejściowe są przetwarzane przy pomocy regexów oraz morfeusza2.
+Dane wejściowe są przetwarzane przy pomocy regexów oraz morfeusza2, aby wygenerować wstępne tokeny dla statycznych danych.
+Następnie wszystko jest przetwarzane ponownie przy użyciu Glinera aby wykryć dane kontekstowe.

@@ -29,18 +29,18 @@ _GL_LABELS = [
 ]
 
 _LABEL_TO_PLACEHOLDER: Dict[str, str] = {
-    "religious affiliation": "{religion}",
-    "religious belief": "{religion}",
-    "political ideology": "{political_view}",
-    "political party": "{political_view}",
-    "health condition": "{health}",
-    "medical condition": "{health}",
-    "sexual orientation": "{sexual_orientation}",
-    "ethnic group": "{ethnicity}",
+    "religious affiliation": "[religion]",
+    "religious belief": "[religion]",
+    "political ideology": "[political_view]",
+    "political party": "[political_view]",
+    "health condition": "[health]",
+    "medical condition": "[health]",
+    "sexual orientation": "[sexual_orientation]",
+    "ethnic group": "[ethnicity]",
 }
 
 _LABEL_TO_PLACEHOLDER = {k.lower(): v for k, v in _LABEL_TO_PLACEHOLDER.items()}
-
+model = get_model()
 
 class GlinerSensitive:
     @staticmethod

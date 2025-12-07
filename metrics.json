@@ -1,7 +1,7 @@
 {
   "input_file": "input.txt",
-  "time_seconds": 13.570115404000262,
-  "time_processing_seconds": 13.52810433400009,
+  "time_seconds": 15.913631372000054,
+  "time_processing_seconds": 15.860291347999919,
   "pc_specs": {
     "os": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
     "cpu": "x86_64",

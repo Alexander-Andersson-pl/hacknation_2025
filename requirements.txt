@@ -6,3 +6,5 @@ morfeusz2
 phonenumbers
 flask
 psutil
+gliner
+torch
