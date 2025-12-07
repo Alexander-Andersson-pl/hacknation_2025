@@ -26,5 +26,5 @@ perf:
 test:
     {{python}} -m pytest -q
 
-build-docker
+build-docker:
     docker build -t anonymizer .
