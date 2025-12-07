@@ -38,7 +38,6 @@ def benchmark(input_path: str, output_path: str, metrics_path: str):
         "time_seconds": full_elapsed,
         "time_processing_seconds": processing_elapsed,
         "pc_specs": specs,
-        "anonymized_output": result
     }
 
     with open(metrics_path, "w", encoding="utf-8") as out:
