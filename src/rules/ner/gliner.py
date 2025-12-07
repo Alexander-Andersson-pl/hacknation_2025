@@ -1,19 +1,14 @@
-# src/rules/ner/gliner_rule.py
-
 from functools import lru_cache
 from typing import List, Dict
 
 from gliner import GLiNER
 
 
-MODEL_NAME = "urchade/gliner_multi-v2.1"  # multilingual, sensowne na PL
+MODEL_NAME = "urchade/gliner_multi-v2.1"
 
 
 @lru_cache(maxsize=1)
 def get_model() -> GLiNER:
-    """
-    Lazy load – model ładuje się tylko przy pierwszym wywołaniu.
-    """
     return GLiNER.from_pretrained(MODEL_NAME, load_tokenizer=True)
 
 
