@@ -15,12 +15,6 @@ class PeselRule:
                 out.append(word)
                 continue
 
-            try:
-                _ = Pesel(word)
-            except Exception:
-                out.append(word)
-                continue
-
             out.append(PeselToken())
 
         return out

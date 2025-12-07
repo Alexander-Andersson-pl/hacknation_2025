@@ -1,5 +1,5 @@
 from typing import List, Any
-from src.rules import token
+from rules import token
 import morfeusz2
 import random
 
@@ -29,9 +29,10 @@ class Age:
                 out.append(word)
                 continue
 
-            if not isInteger(tokens[idx - 1]):
+            if not isinstance(tokens[idx - 1], str) or not isinstance(tokens[idx -2], str) or not isInteger(tokens[idx - 1]):
                 out.append(word)
                 continue
+
 
             analyzed = self.morfeusz.analyse(tokens[idx - 2])
             isHave = False

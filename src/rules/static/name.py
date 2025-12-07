@@ -94,17 +94,10 @@ class Name:
                 normalized.append(current)
                 continue
 
-            # check next
-            if i >= len(tokens) - 2:
-                continue
-
-            next = tokens[i + 1]
-            if not isinstance(next, NameToken):
-                normalized.append(next)
-                continue
-
+            # eat following names as they are part of street name
+            while i < len(tokens) - 1 and isinstance(tokens[i+1], NameToken):
+                i+=1
             normalized.append(AddressToken())
-            i += 1  # Skip next element
 
             # Check for number after street
             if i >= len(tokens) - 1:

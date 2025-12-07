@@ -2,9 +2,7 @@ from rules.static import bank_account, name, credit_card, email, pesel_rule
 from src.rules.static import age
 import morfeusz2
 from flask import Flask, request, jsonify
-from rules.ner import gliner_rule
-
-morf = morfeusz2.Morfeusz()
+from src.rules.ner import gliner
 
 
 def mapToString(x) -> str:
@@ -14,8 +12,15 @@ def mapToString(x) -> str:
         return x.label()
 
 
-input = "Nazywam się Jan Kowalski, mój PESEL to 87091118526. Mieszkam w Warszawie przy ulicy Długiej 5. Lubię Warszawę. Miałem 5 lat. Mieszkam w domu. Mieszkam w Warszawie."
+def regenerateToken(x) -> str:
+    if isinstance(x, str):
+        return x
+    else:
+        return x.generate()
 
+
+morf = morfeusz2.Morfeusz()
+app = Flask(__name__)
 static_rules = [
     bank_account.BankAccount,
     name.Name(morf),
@@ -33,45 +38,39 @@ def anonymize(input: str, regenerate: bool) -> str:
         tokens = sentence.split()
         for rule in static_rules:
             tokens = rule.anonymize(tokens)
-        tokens = gliner_rule.GlinerSensitive.anonymize(tokens)
-
-        parsed.append(" ".join(map(mapToString, tokens)))
-
-    return ".".join(parsed)
 
 
-app = Flask(__name__)
+        if not regenerate:
+            parsed.append(" ".join(map(mapToString, tokens)))
+        else:
+            parsed.append(" ".join(map(regenerateToken, tokens)))
+
+    out = ". ".join(parsed)
+    return gliner.GlinerSensitive.anonymize(out)
 
 
-@app.route("/api/parse", methods=["POST"])
+@app.route('/api/parse', methods=['POST'])
 def parse():
     data = request.get_json(silent=True)
     if data and "text" in data:
         text = data["text"]
     else:
-        # fallback: raw body as text
-        text = request.data.decode("utf-8")
+        return jsonify({"error": "invalid request"}), 400
 
-    # 2. Get 'randomize' flag from query param, default False
-    randomize_flag = request.args.get("randomize", "false").lower() in (
-        "1",
-        "true",
-        "yes",
-    )
+    randomize_flag = request.args.get('randomize', 'false').lower() in ('1', 'true', 'yes')
 
-    # 3. Process
     result = anonymize(text, randomize_flag)
 
-    # 4. Return JSON
-    return jsonify(
-        {"original": text, "anonymized": result, "randomize": randomize_flag}
-    )
+    return jsonify({
+        "anonymized": result,
+    })
+
 
 
 @app.route("/", methods=["GET"])
 def index():
     return """
-    <!DOCTYPE html>
+   <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -124,6 +123,9 @@ def index():
     <textarea id="outputText" placeholder="Anonymized output will appear here..." readonly></textarea>
   </div>
   <div class="controls">
+    <label style="margin-right:10px;">
+      <input type="checkbox" id="regenerateFlag"> regenerate
+    </label>
     <button onclick="sendData()">Anonymize</button>
   </div>
 
@@ -131,7 +133,7 @@ def index():
     async function sendData() {
       const text = document.getElementById("inputText").value;
       try {
-        const response = await fetch("http://localhost:8000/api/parse", {
+        const response = await fetch("http://localhost:8000/api/parse" + (document.getElementById("regenerateFlag").checked ? "?regenerate=true" : ""), {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ text })
@@ -145,8 +147,9 @@ def index():
   </script>
 </body>
 </html>
-    """
+
+"""
 
 
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
