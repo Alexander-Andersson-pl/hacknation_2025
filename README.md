@@ -4,7 +4,7 @@ zadanie: Dane bez twarzy
 nazwa_zespolu:"nazwa_druzyny"
 
 
-In our solution we are using regex and Morfeusz2 together with our defined rules to anonymize sensitive data.
+In our solution we are using regex and Morfeusz2 together with our defined rules and LLM engine (Gliner - NER) to anonymize sensitive data.
 
 # Structure
 
@@ -15,7 +15,6 @@ Code is located in /src                                                         
 |- perftest.py - generates ouput and performance information based in test input.               \
 |- rules/      - contains some base classes.                                                    \
 |--- static/    - contains anonymizing rules for data that doesn't require context to process.   \
-
 
 # Data flow
 
