@@ -1,7 +1,7 @@
 from rules.static import bank_account, name, credit_card, email, pesel_rule, age
 import morfeusz2
 from flask import Flask, request, jsonify
-from rules.ner import gliner
+
 
 def mapToString(x) -> str:
     if isinstance(x, str):
@@ -43,8 +43,7 @@ def anonymize(input: str, regenerate: bool) -> str:
         else:
             parsed.append(" ".join(map(regenerateToken, tokens)))
 
-    out = ". ".join(parsed)
-    return gliner.anonymize(out)
+    return ". ".join(parsed)
 
 
 @app.route('/api/parse', methods=['POST'])
