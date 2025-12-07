@@ -4,7 +4,8 @@ pc_specs:
 	CPU Intel Core7 150U @ 1.8GHZ
 	GPU None
 	16 GB RAM
-used PLLUM API or another model: No
+used PLLUM API: No
+another model: Locally setup `urchade/gliner_multi-v2.1` within gliner.
 
 
 
