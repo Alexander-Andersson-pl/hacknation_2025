@@ -1,7 +1,7 @@
 from typing import List, Any
 
 from pesel import Pesel
-from src.rules import token
+from rules import token
 
 
 class PeselRule:

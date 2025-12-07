@@ -1,5 +1,5 @@
 from typing import List, Any
-from src.rules import token
+from rules import token
 from enum import Enum
 import morfeusz2
 
@@ -14,9 +14,9 @@ class NameType(Enum):
             case NameType.Unknown:
                 return "unknown"
             case NameType.FirstName:
-                return "first_name"
+                return "name"
             case NameType.LastName:
-                return "last_name"
+                return "surname"
             case NameType.Location:
                 return "location"
 

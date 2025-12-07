@@ -20,5 +20,8 @@ install:
 main:
     {{python}} src/main.py
 
+perf:
+    {{python}} src/perftest.py
+
 test:
     {{python}} -m pytest -q

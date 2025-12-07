@@ -1,0 +1,10 @@
+time_seconds: 12.78
+pc_specs:
+	Laptop Samsung NP750QGK
+	CPU Intel Core7 150U @ 1.8GHZ
+	GPU None
+	16 GB RAM
+used PLLUM API or another model: No
+
+
+

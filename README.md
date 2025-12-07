@@ -4,7 +4,29 @@ zadanie: Dane bez twarzy
 nazwa_zespolu:"nazwa_druzyny"
 
 
+W naszym rozwiązaniu korzystamy z regexów i Morfeusza2 wraz z zbudowanymi zasadami, aby anonimizować wrażliwe dane.
+
+# Structure
+
+Code is located in /src
+/src
+|
+|- main.py     - launches an http server listening on :8000. 
+|- perftest.py - generates ouput and performance information based in test input. 
+|- rules/      - contains some base classes.
+ |- static/    - contains anonymizing rules for data that doesn't require context to process.
+
+
+# Data flow
+
+Incoming data is split into sentences and the passed to each of the anonymizing rules for processing.
+In each pass sensitive data is replaced with corresponding token that can be used to either return a data template with fragments in brackets, or to generate new randomized data in appropriate places.
+
+
+
 # Running
+
+For local run requirest installed and setup [morfeus](https://morfeusz.sgjp.pl/download/).
 
 In order to run either do:
     just install-env

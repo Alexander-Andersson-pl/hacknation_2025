@@ -1,7 +1,7 @@
 import random
 from typing import List, Any
 from schwifty import exceptions, IBAN
-from src.rules import token
+from rules import token
 
 
 class BankAccount:

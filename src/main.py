@@ -1,8 +1,6 @@
-from rules.static import bank_account, name, credit_card, email, pesel_rule
-from src.rules.static import age
+from rules.static import bank_account, name, credit_card, email, pesel_rule, age
 import morfeusz2
 from flask import Flask, request, jsonify
-from src.rules.ner import gliner
 
 
 def mapToString(x) -> str:
@@ -34,19 +32,18 @@ static_rules = [
 def anonymize(input: str, regenerate: bool) -> str:
     sentences = input.split(".")
     parsed = []
+    # TODO: parallelize each sentence
     for sentence in sentences:
         tokens = sentence.split()
         for rule in static_rules:
             tokens = rule.anonymize(tokens)
-
 
         if not regenerate:
             parsed.append(" ".join(map(mapToString, tokens)))
         else:
             parsed.append(" ".join(map(regenerateToken, tokens)))
 
-    out = ". ".join(parsed)
-    return gliner.GlinerSensitive.anonymize(out)
+    return ". ".join(parsed)
 
 
 @app.route('/api/parse', methods=['POST'])

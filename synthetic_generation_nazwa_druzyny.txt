@@ -1,0 +1,2 @@
+For generatic synthetic information we planned to use morfeusz2 to store grammar form metadata within the tags during processing.
+Then we could use the same tags with morfeusz generator to properly modify new randomized data to correct form.

@@ -1,7 +1,7 @@
 import random
 import re
 from typing import List, Any
-from src.rules import token
+from rules import token
 
 CCNUMBER_REGEX = r"\d{13,19}"
 

@@ -5,5 +5,4 @@ spacy
 morfeusz2
 phonenumbers
 flask
-gliner
-torch
+psutil
