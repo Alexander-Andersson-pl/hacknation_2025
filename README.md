@@ -8,13 +8,13 @@ In our solution we are using regex and Morfeusz2 together with our defined rules
 
 # Structure
 
-Code is located in /src
-/src
-|
-|- main.py     - launches an http server listening on :8000. 
-|- perftest.py - generates ouput and performance information based in test input. 
-|- rules/      - contains some base classes.
- |- static/    - contains anonymizing rules for data that doesn't require context to process.
+Code is located in /src                                                                         \
+/src                                                                                            \
+|                                                                                               \
+|- main.py     - launches an http server listening on :8000.                                    \
+|- perftest.py - generates ouput and performance information based in test input.               \
+|- rules/      - contains some base classes.                                                    \
+|--- static/    - contains anonymizing rules for data that doesn't require context to process.   \
 
 
 # Data flow
