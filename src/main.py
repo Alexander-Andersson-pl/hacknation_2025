@@ -2,14 +2,17 @@ from rules.static import bank_account, name, credit_card, email, pesel_rule
 from src.rules.static import age
 import morfeusz2
 from flask import Flask, request, jsonify
+from rules.ner import gliner_rule
 
 morf = morfeusz2.Morfeusz()
+
 
 def mapToString(x) -> str:
     if isinstance(x, str):
         return x
     else:
         return x.label()
+
 
 input = "Nazywam się Jan Kowalski, mój PESEL to 87091118526. Mieszkam w Warszawie przy ulicy Długiej 5. Lubię Warszawę. Miałem 5 lat. Mieszkam w domu. Mieszkam w Warszawie."
 
@@ -22,6 +25,7 @@ static_rules = [
     age.Age(morf),
 ]
 
+
 def anonymize(input: str, regenerate: bool) -> str:
     sentences = input.split(".")
     parsed = []
@@ -29,38 +33,42 @@ def anonymize(input: str, regenerate: bool) -> str:
         tokens = sentence.split()
         for rule in static_rules:
             tokens = rule.anonymize(tokens)
+        tokens = gliner_rule.GlinerSensitive.anonymize(tokens)
 
         parsed.append(" ".join(map(mapToString, tokens)))
 
     return ".".join(parsed)
 
 
-
 app = Flask(__name__)
 
-@app.route('/api/parse', methods=['POST'])
+
+@app.route("/api/parse", methods=["POST"])
 def parse():
     data = request.get_json(silent=True)
     if data and "text" in data:
         text = data["text"]
     else:
         # fallback: raw body as text
-        text = request.data.decode('utf-8')
+        text = request.data.decode("utf-8")
 
     # 2. Get 'randomize' flag from query param, default False
-    randomize_flag = request.args.get('randomize', 'false').lower() in ('1','true','yes')
+    randomize_flag = request.args.get("randomize", "false").lower() in (
+        "1",
+        "true",
+        "yes",
+    )
 
     # 3. Process
     result = anonymize(text, randomize_flag)
 
     # 4. Return JSON
-    return jsonify({
-        "original": text,
-        "anonymized": result,
-        "randomize": randomize_flag
-    })
+    return jsonify(
+        {"original": text, "anonymized": result, "randomize": randomize_flag}
+    )
 
-@app.route('/', methods=['GET'])
+
+@app.route("/", methods=["GET"])
 def index():
     return """
     <!DOCTYPE html>
@@ -139,5 +147,6 @@ def index():
 </html>
     """
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=True)
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)
